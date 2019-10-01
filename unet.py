@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 
 from nc_loader import ERA5Dataset
 
-train_fnames = ["/data/ERA5/era5s_geop_201801.nc", 
-                "/data/ERA5/era5s_geop_201802.nc", 
-                "/data/ERA5/era5s_geop_201804.nc", 
-                "/data/ERA5/era5s_geop_201805.nc", 
-                "/data/ERA5/era5s_geop_201806.nc"] 
+train_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201801.nc", 
+                "/home/lar116/project/ERA5_ECMWF/era5s_geop_201802.nc", 
+                "/home/lar116/project/ERA5_ECMWF/era5s_geop_201804.nc", 
+                "/home/lar116/project/ERA5_ECMWF/era5s_geop_201805.nc", 
+                "/home/lar116/project/ERA5_ECMWF/era5s_geop_201806.nc"] 
 train_dataset = ERA5Dataset(train_fnames, batch_size=4)
 
-test_fnames = ["/data/ERA5/era5s_geop_201803.nc"]
+test_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201803.nc"]
 test_dataset = ERA5Dataset(test_fnames, batch_size=4)
 
 
@@ -97,7 +97,14 @@ def Unet():
     return tf.keras.Model(inputs=inputs, outputs=x)
 
 
+strategy = tf.distribute.MirroredStrategy()
+with strategy.scope():
+    model = Unet()
+    model.compile(loss='mse', optimizer=tf.keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True))
+    model.fit(train_dataset, epochs=50, verbose=1, validation_data=test_dataset)
 
+"""
 model = Unet()
-model.compile(optimizer=tf.keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True), loss='mse')
-model.fit_generator(train_dataset, epochs=50, verbose=2, validation_data=test_dataset)
+model.compile(loss='mse', optimizer=tf.keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True))
+model.fit(train_dataset, epochs=50, verbose=1, validation_data=test_dataset)
+"""
