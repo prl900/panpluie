@@ -26,7 +26,9 @@ def downsample(filters, size, apply_batchnorm=True):
     result = tf.keras.Sequential()
     #result.add(tf.keras.layers.Conv2D(filters, size, strides=2, padding='same',
     #                                  #kernel_initializer=initializer, use_bias=False))
-    result.add(tf.keras.layers.Conv2D(filters, size, strides=2, activation='relu', padding='same'))
+    result.add(tf.keras.layers.Conv2D(filters, size, strides=1, activation='relu', padding='same'))#, 
+    result.add(tf.keras.layers.Conv2D(filters, size, strides=2, activation='relu', padding='same'))#, 
+                                      #kernel_regularizer=tf.keras.regularizers.l1(0.01)))
 
     if apply_batchnorm:
         result.add(tf.keras.layers.BatchNormalization(axis=3))
@@ -42,7 +44,9 @@ def upsample(filters, size, apply_dropout=False):
     result = tf.keras.Sequential()
     #result.add(tf.keras.layers.Conv2DTranspose(filters, size, strides=2, padding='same',
     #                                           kernel_initializer=initializer, use_bias=False))
-    result.add(tf.keras.layers.Conv2DTranspose(filters, size, strides=2, padding='same', activation='relu'))
+    result.add(tf.keras.layers.Conv2D(filters, size, strides=1, activation='relu', padding='same'))#, 
+    result.add(tf.keras.layers.Conv2DTranspose(filters, size, strides=2, activation='relu', padding='same'))#, 
+                                               #kernel_regularizer=tf.keras.regularizers.l1(0.01)))
 
     result.add(tf.keras.layers.BatchNormalization(axis=3))
 
@@ -67,8 +71,8 @@ def Unet():
                ]
 
     initializer = tf.random_normal_initializer(0., 0.02)
-    last = tf.keras.layers.Conv2DTranspose(1, 4, strides=2, padding='same',
-                                           kernel_initializer=initializer, activation='relu')
+    last = tf.keras.layers.Conv2DTranspose(1, 4, strides=2, padding='same', activation='relu')#,
+                                           #kernel_initializer=initializer, activation='relu')
 
     concat = tf.keras.layers.Concatenate()
 
@@ -96,4 +100,4 @@ def Unet():
 
 model = Unet()
 model.compile(optimizer=tf.keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True), loss='mse')
-model.fit_generator(train_dataset, epochs=5, verbose=1, validation_data=test_dataset)
+model.fit_generator(train_dataset, epochs=50, verbose=2, validation_data=test_dataset)
