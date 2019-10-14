@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 from nc_loader import ERA5Dataset
 
-
 def Unet():
     concat_axis = 3
     inputs = layers.Input(shape = (720, 1440, 3))
@@ -106,8 +105,8 @@ def train_step(model, inputs, outputs, optimizer):
   with tf.GradientTape() as t:
     loss = tf.reduce_mean(tf.square(outputs - model(inputs, training=True)))
 
-    grads = t.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(grads, model.trainable_variables))
+  grads = t.gradient(loss, model.trainable_variables)
+  optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
 
 @tf.function
@@ -120,22 +119,26 @@ def train(train_dataset, test_dataset, model):
 
   train_loss = tf.keras.metrics.Mean()
   test_loss = tf.keras.metrics.Mean()
+  
+  f = open("train_record.out","w+")
 
   for epoch in range(100):
     for (batch, (inputs, outputs)) in enumerate(train_dataset):
-    
       train_step(model, inputs, outputs, optimizer)
       train_loss(calc_loss(model, inputs, outputs))
       
     for (inputs, outputs) in test_dataset:
       test_loss(calc_loss(model, inputs, outputs))
 
-    template = 'Epoch {}, Loss: {:.4f}, Test Loss: {:.4f}'
+    template = 'Epoch {}, Loss: {:.4f}, Test Loss: {:.4f}\n'
     print(template.format(epoch+1, train_loss.result(), test_loss.result()))
+    f.write(template.format(epoch+1, train_loss.result(), test_loss.result()))
+    f.flush()
 
     train_loss.reset_states()
     test_loss.reset_states()
 
+  f.close()
 
 train_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201801.nc", 
                 "/home/lar116/project/ERA5_ECMWF/era5s_geop_201802.nc", 
@@ -145,8 +148,8 @@ train_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201801.nc",
 
 test_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201803.nc"]
 
-training_dataset = ERA5Dataset(train_fnames, batch_size=4)
-test_dataset = ERA5Dataset(test_fnames, batch_size=4)
+training_dataset = ERA5Dataset(train_fnames, batch_size=8)
+test_dataset = ERA5Dataset(test_fnames, batch_size=8)
 
 model = Unet()
 print(model.summary())
