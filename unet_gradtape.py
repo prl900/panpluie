@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from keras import backend as K
 import tensorflow as tf
 from tensorflow.keras import layers
+from tensorflow.keras import backend as K
 
 import os
 import time
@@ -130,7 +130,7 @@ def train(train_dataset, test_dataset, model):
     for (inputs, outputs) in test_dataset:
       test_loss(calc_loss(model, inputs, outputs))
 
-    template = 'Epoch {}, Loss: {:.4f}, Test Loss: {:.4f}\n'
+    template = 'Epoch {}, Loss: {:.4f}, Test Loss: {:.4f}'
     print(template.format(epoch+1, train_loss.result(), test_loss.result()))
     f.write(template.format(epoch+1, train_loss.result(), test_loss.result()))
     f.flush()
@@ -140,6 +140,7 @@ def train(train_dataset, test_dataset, model):
 
   f.close()
 
+"""
 train_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201801.nc", 
                 "/home/lar116/project/ERA5_ECMWF/era5s_geop_201802.nc", 
                 "/home/lar116/project/ERA5_ECMWF/era5s_geop_201804.nc", 
@@ -147,9 +148,18 @@ train_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201801.nc",
                 "/home/lar116/project/ERA5_ECMWF/era5s_geop_201806.nc"] 
 
 test_fnames = ["/home/lar116/project/ERA5_ECMWF/era5s_geop_201803.nc"]
+"""
 
-training_dataset = ERA5Dataset(train_fnames, batch_size=8)
-test_dataset = ERA5Dataset(test_fnames, batch_size=8)
+train_fnames = ["/data/ERA5/era5s_geop_201801.nc", 
+                "/data/ERA5/era5s_geop_201802.nc", 
+                "/data/ERA5/era5s_geop_201804.nc", 
+                "/data/ERA5/era5s_geop_201805.nc", 
+                "/data/ERA5/era5s_geop_201806.nc"] 
+
+test_fnames = ["/data/ERA5/era5s_geop_201803.nc"]
+
+training_dataset = ERA5Dataset(train_fnames, batch_size=4)
+test_dataset = ERA5Dataset(test_fnames, batch_size=4)
 
 model = Unet()
 print(model.summary())
