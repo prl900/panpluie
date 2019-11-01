@@ -121,6 +121,7 @@ def train(train_dataset, test_dataset, model):
   test_loss = tf.keras.metrics.Mean()
   
   f = open("train_record.out","w+")
+  f.write('epoch, train_loss, test_loss')
 
   for epoch in range(100):
     for (batch, (inputs, outputs)) in enumerate(train_dataset):
@@ -132,7 +133,7 @@ def train(train_dataset, test_dataset, model):
 
     template = 'Epoch {}, Loss: {:.4f}, Test Loss: {:.4f}'
     print(template.format(epoch+1, train_loss.result(), test_loss.result()))
-    f.write(template.format(epoch+1, train_loss.result(), test_loss.result()))
+    f.write('{},{:.4f},{:.4f}'.format(epoch+1, train_loss.result(), test_loss.result()))
     f.flush()
 
     train_loss.reset_states()
