@@ -6,8 +6,7 @@ tf.compat.v1.enable_eager_execution()
 class gen:
     def __call__(self, fname):
         dsg = xr.open_dataset(fname.decode("utf-8"))
-        #dsp = xr.open_dataset("/home/lar116/project/ERA5_ECMWF/era5_prec_2018H1.nc")
-        dsp = xr.open_dataset("/data/ERA5/era5_prec_2018H1.nc")
+        dsp = xr.open_dataset(os.path.join(os.path.dirname(fname.decode("utf-8")), "era5_prec_2018H1.nc"))
         for t in dsg.time:
             yield (dsg['z'].sel(time=t).data[:720, :, :], dsp['tp'].sel(time=t).data[:720, :, None]*1000)
 
