@@ -291,5 +291,6 @@ test_fnames = ["/data/ERA5/era5s_geop_201803.nc"]
 
 train_dataset = ERA5Datast(train_fnames, batch_size=4)
 test_dataset = ERA5Dataset(test_fnames, batch_size=4)
+
 EPOCHS = 50
 fit(train_dataset, test_dataset, EPOCHS)
