@@ -1,5 +1,6 @@
 import xarray as xr
 import tensorflow as tf
+import os
 
 tf.compat.v1.enable_eager_execution()
 
